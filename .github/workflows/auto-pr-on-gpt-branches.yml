@@ -1,0 +1,44 @@
+name: Auto PR on GPT branches
+
+on:
+  push:
+    branches:
+      - 'gpt1/**'
+      - 'gpt2/**'
+
+jobs:
+  open-pr:
+    name: Open/Update PR to main from GPT branch
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure GitHub CLI
+        run: |
+          if ! command -v gh >/dev/null 2>&1; then
+            sudo apt-get update -y
+            sudo apt-get install -y gh
+          fi
+
+      - name: Create or update PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SRC="${GITHUB_REF_NAME}"
+          TITLE="Auto PR from ${SRC}"
+          BODY=$'Opened automatically from branch **'"${SRC}"'**.\n\n- Base: **main**\n- Head: **'"${SRC}"'**\n- Trigger: push event\n'
+
+          # If a PR already exists from this head, update; else create
+          PR_NUM=$(gh pr list --base main --head "${SRC}" --json number -q '.[0].number' || true)
+          if [[ -n "${PR_NUM}" ]]; then
+            echo "Updating existing PR #${PR_NUM}"
+            gh pr edit "${PR_NUM}" --title "${TITLE}" --body "${BODY}"
+          else
+            echo "Creating new PR from ${SRC} -> main"
+            gh pr create --base main --head "${SRC}" --title "${TITLE}" --body "${BODY}"
+          fi
