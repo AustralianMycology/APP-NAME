@@ -1,0 +1,10 @@
+name: CI
+on:
+  pull_request:
+    branches: [ main ]
+jobs:
+  sanity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: CI sanity check
+        run: echo "✅ CI sanity check passed"
