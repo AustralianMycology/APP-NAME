@@ -1,0 +1,3 @@
+- PRs from gpt2/setup only
+- Must pass: pytest -q
+- Execute only tasks in gpt2/tasks/*.yaml

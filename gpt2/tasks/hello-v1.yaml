@@ -1,0 +1,8 @@
+id: hello-v1
+goal: "Implement hello.greet(name)->str and tests."
+changes:
+  - "Create src/hello.py with greet(name)->str returning 'Hello, {name}!'"
+  - "Create tests/test_hello.py with two asserts."
+quality:
+  - "PEP8"
+  - "pytest passes"
