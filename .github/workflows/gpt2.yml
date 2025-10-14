@@ -1,0 +1,25 @@
+name: gpt2-auto-commit
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "gpt2/tasks/**"
+jobs:
+  run:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install deps
+        run: pip install openai pyyaml pytest
+      - name: Execute GPT-2 runner
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: gpt-5.1-mini
+          GPT2_TASK_GLOB: gpt2/tasks/*.yaml
+          GPT2_BRANCH: gpt2/setup
+        run: python scripts/gpt2_runner.py
